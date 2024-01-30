@@ -34,7 +34,7 @@ const AddListScreen = props => {
         }
         
         alert(name + ' Added.');
-        navigation.navigate('Start Shopping!');
+        // navigation.navigate('Start Shopping!');
     }
 
   return (
