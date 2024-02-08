@@ -22,9 +22,13 @@ const List = props => {
             <View style={{flex: 1}}>
                 <Text style={styles.date}>{post.date}</Text>
             </View>
+            <View style={{flex: 0.7, backgroundColor: post.color}}>
+                <Text style={styles.priorityStyle}>{post.priority}</Text>
+            </View>
         </TouchableOpacity>
     </View>
   );
 };
 
 export default List;
+

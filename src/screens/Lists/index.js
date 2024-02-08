@@ -18,6 +18,8 @@ const ListsScreen = props => {
 
   const [lists, setLists] = useState([]);
 
+  var colorC = '';
+
   useEffect(() => {
     const listener = navigation.addListener('focus', () => {
       // declare empty array that will store results of SELECT
@@ -33,17 +35,28 @@ const ListsScreen = props => {
             // get the number of rows selected 
             let len = res.rows.length;
             console.log('Number of rows: ' + len);
+            
+
             // if more than one row of data was selected
             if ( len > 0){
               // loop through the rows of data
               for (let i = 0; i < len; i++){
                 // push a row of data at a time onto results array
                 let item = res.rows.item(i);
+
+                if (item.priority == 'HIGH'){
+                  colorC = 'red';
+                } else if (item.priority == 'LOW'){
+                  colorC = 'green';
+                }
+
                 results.push({
                   id: item.id,
                   name: item.name,
                   store: item.store,
                   date: item.date,
+                  priority: item.priority,
+                  color: colorC,
                 });
               }
               // assign results array to lists state variable
