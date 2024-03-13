@@ -3,6 +3,8 @@ import styles from './styles';
 import { View, Text, TextInput, Pressable, Alert } from 'react-native';
 // import openDatabase hook
 import { openDatabase } from "react-native-sqlite-storage";
+import SelectDropdown from 'react-native-select-dropdown';
+import DateTimePickerAndroid from '@react-native-community/datetimepicker';
 
 // create constant object that refers to database
 const shopperDB = openDatabase({name: 'Shopper.db'});
@@ -13,11 +15,26 @@ const listsTableName = 'lists';
 const ExistingListScreen = props => {
 
     const post = props.route.params.post;
+    
 
     const [name, setName] = useState(post.name);
     const [store, setStore] = useState(post.store);
-    const [date, setDate] = useState(post.date);
+    const [date, setDate] = useState(new Date());
     const [priority, setPriority] = useState(post.priority);
+    const [datePicker, setDatePicker] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(post.date);
+
+    const priorityNames = ['HIGH', 'LOW'];
+
+    function showDatePicker() {
+        setDatePicker(true);
+    }
+
+    function onDateSelected(event, value) {
+        setDate(value);
+        setDatePicker(false);
+        setSelectedDate(value.toLocaleDateString());
+    }
 
     const onListUpdate = () => {
         if (!name){
@@ -39,7 +56,7 @@ const ExistingListScreen = props => {
 
         shopperDB.transaction(txn => {
             txn.executeSql(
-                `UPDATE ${listsTableName} SET name = "${name}", store = "${store}", date = "${date}", priority = "${priority}" WHERE id = "${post.id}"`,
+                `UPDATE ${listsTableName} SET name = "${name}", store = "${store}", date = "${date.toLocaleDateString()}", priority = "${priority}" WHERE id = "${post.id}"`,
                 [],
                 () => {
                     console.log(`${name} updated successfully`);
@@ -112,19 +129,47 @@ const ExistingListScreen = props => {
                 placeholder={'Enter Store'}
                 placeholderTextColor={'grey'}
             />
-            <TextInput 
-                value={priority}
-                onChangeText={value => setPriority(value)}
-                style={styles.priority}
-                placeholder={'Enter Priority (HIGH, LOW)'}
-                placeholderTextColor={'grey'}
+            <SelectDropdown
+                data={priorityNames}
+                defaultValue={priority}
+                defaultButtonText={'Select Priority'}
+                onSelect={(selectedItem, index) => {
+                    setPriority(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                    return selectedItem;
+                }}
+                rowTextForSelection={(item, index) => {
+                    return item;
+                }}
+                buttonStyle={styles.dropdownBtnStyle}
+                buttonTextStyle={styles.dropdownBtnTxtStyle}
+                dropdownStyle={styles.dropdownDropdownStyle}
+                rowStyle={styles.dropdownRowStyle}
+                rowTextStyle={styles.dropdownRowTxtStyle}
             />
+            {datePicker && (
+                <DateTimePickerAndroid
+                    value={date}
+                    mode={'date'}
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    is24Hour={true}
+                    onChange={onDateSelected}
+                    minimumDate={new Date(Date.now())}
+                />
+            )}
+            {!datePicker && (
+                <View>
+                    <Pressable onPress={showDatePicker} style={styles.dateButton}>
+                        <Text style={styles.dateButtonText}>Select A Date</Text>
+                    </Pressable>
+                </View>
+            )}
             <TextInput 
-                value={date}
-                onChangeText={value => setDate(value)}
+                value={selectedDate}
                 style={styles.date}
-                placeholder={'Enter Date in format YYYY-MM-DD'}
-                placeholderTextColor={'grey'}
+                placeholder={'Selected Date'}
+                editable={false}
             />
         </View>
         <View style={styles.bottomContainer}>
