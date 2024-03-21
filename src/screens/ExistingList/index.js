@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './styles';
 import { View, Text, TextInput, Pressable, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 // import openDatabase hook
 import { openDatabase } from "react-native-sqlite-storage";
 import SelectDropdown from 'react-native-select-dropdown';
@@ -25,6 +26,8 @@ const ExistingListScreen = props => {
     const [selectedDate, setSelectedDate] = useState(post.date);
 
     const priorityNames = ['HIGH', 'LOW'];
+
+    const navigation = useNavigation();
 
     function showDatePicker() {
         setDatePicker(true);
@@ -105,10 +108,12 @@ const ExistingListScreen = props => {
     }
 
     const onAddItem = () => {
+        navigation.navigate('Add List Item', {post: post});
         
     }
 
     const onViewList = () => {
+        navigation.navigate('View List Items', {post: post});
         
     }
 
